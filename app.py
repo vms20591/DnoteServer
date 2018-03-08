@@ -13,7 +13,7 @@ def sync():
 
     print "Request: ", json_data
 
-    return resp, 200
+    return "ok", 200
 
 if __name__ == "__main__":
     app.run(debug=False)

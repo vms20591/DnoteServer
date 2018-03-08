@@ -11,19 +11,23 @@ def sync():
     raw_data = base64.b64decode(payload["actions"])
     json_data = json.loads(zlib.decompress(raw_data, 16 + zlib.MAX_WBITS))
 
-    data = payload
-    data['actions'] = json_data
+    data = json_data
     saveData(data)
-    print "Request: ", json_data
-    print payload
 
     return jsonify({u'bookmark':2,u'actions':[]}), 200
 
+def sillyDataAppend(old, data):
+    for item in data:
+        if (item not in old):
+            old.append(item)
+
+    # maybe should compare *type* value
+    return sorted(old, key=lambda o:o['timestamp'])
+
 def saveData(data):
     old = readData()
-    print old
-    old.append(data)
-    writeData(old)
+    newdata = sillyDataAppend(old, data)
+    writeData(newdata)
 
 
 def writeData(data):

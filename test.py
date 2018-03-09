@@ -12,9 +12,25 @@ def sync():
     json_data = json.loads(zlib.decompress(raw_data, 16 + zlib.MAX_WBITS))
 
     data = json_data
-    saveData(data)
+    # saveData(data)
+    mdata = [{"data": {"book_name": "test"}, "type": "add_book", "id": 0, "timestamp": 1518620066}]
+    print fetchResponse(mdata)
+
 
     return jsonify({u'bookmark':2,u'actions':[]}), 200
+
+def fetchResponse(data):
+    def fresh(x):
+        return x["timestamp"] > maxTimestamp
+
+    maxTimestamp = getMaxTs(data)
+    print maxTimestamp
+    alldata = readData()
+    actions = filter(fresh, alldata)
+    return actions
+
+def getMaxTs(data):
+    return sorted(data, key=lambda o:o['timestamp'])[-1]["timestamp"]
 
 def sillyDataAppend(old, data):
     for item in data:

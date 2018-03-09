@@ -15,6 +15,7 @@ def sync():
     json_data = json.loads(zlib.decompress(raw_data, 16 + zlib.MAX_WBITS))
 
     data = json_data
+    if data is None: data = []
     # saveData(data)
     # mdata = [{"data": {"book_name": "test"}, "type": "add_book", "id": 0, "timestamp": 1518620066}]
     # print fetchResponse(mdata)

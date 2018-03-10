@@ -2,12 +2,16 @@ from flask import Flask, request, jsonify
 import zlib
 import base64
 import json
+import os.path
 
 app = Flask(__name__)
 
 ## global server action id. should init in first run
 id = 0
+ID_FILE_PATH = "id"
+DATA_FILE_PATH = "data.json"
 
+## deal with cli data
 @app.route("/v1/sync", methods=["GET", "POST"])
 def sync():
     payload = json.loads(request.data)
@@ -33,11 +37,11 @@ def sync():
 ## functions about id
 def initId():
     global id
-    with open('./id') as infile:
+    with open(ID_FILE_PATH) as infile:
         id = json.load(infile)[u'id']
 
 def saveId():
-    with open('./id', 'w') as outfile:
+    with open(ID_FILE_PATH, 'w') as outfile:
         json.dump({u'id':id}, outfile)
 
 def generateId():
@@ -81,6 +85,7 @@ def isDuplicate(item, collections):
     return False
 
 
+## functions about read/write file
 def saveData(data):
     old = readData()
     newdata = sillyDataAppend(old, data)
@@ -88,15 +93,25 @@ def saveData(data):
 
 
 def writeData(data):
-    with open("data.json", 'w') as outfile:
+    with open(DATA_FILE_PATH, 'w') as outfile:
         json.dump(data, outfile)
 
 def readData():
-    with open("data.json") as infile:
+    with open(DATA_FILE_PATH) as infile:
         data = json.load(infile)
         return data
     return []
 
+## functions to initialize data files
+def initDataFiles():
+    if not os.path.isfile(ID_FILE_PATH):
+        id = 0
+        saveId()
+    if not os.path.isfile(DATA_FILE_PATH):
+        writeData([])
+
+## main function
 if __name__ == "__main__":
+    initDataFiles()
     initId()
     app.run(debug=False)
